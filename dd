@@ -1,0 +1,39 @@
+app.post('/track', async (req, res) => {
+  const { transaction_no } = req.body;
+  console.log('[DEBUG] Nomor transaksi:', transaction_no);
+
+  const url = `https://api.jurnal.id/public/api/v1/sales_invoices/${transaction_no}`;
+  const urlObj = new URL(url);
+  const requestLine = `GET ${urlObj.pathname} HTTP/1.1`;
+
+  const date = new Date().toUTCString();
+  const stringToSign = `date: ${date}\n${requestLine}`;
+  const signature = crypto
+    .createHmac('sha256', process.env.JURNAL_SECRET_KEY)
+    .update(stringToSign)
+    .digest('base64');
+
+  const authorization = `hmac ${process.env.JURNAL_CLIENT_ID}:${signature}`;
+
+  try {
+    const result = await axios.get(url, {
+      headers: {
+        'Authorization': authorization,
+        'Date': date
+      }
+    });
+
+    const invoice = result.data.sales_invoice;
+    res.json({
+      success: true,
+      data: {
+        display_name: invoice?.person?.display_name || '',
+        transaction_date: invoice?.transaction_date || '',
+        quantity: invoice?.line_items?.[0]?.quantity ?? 0
+      }
+    });
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    res.json({ success: false, message: 'Transaksi tidak ditemukan atau error dari API Jurnal.' });
+  }
+});
