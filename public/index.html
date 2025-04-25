@@ -37,23 +37,9 @@
     }
     #reader {
       width: 100%;
-      max-width: 500px;
+      max-width: 400px;
       margin: 1rem auto;
       display: none;
-      position: relative;
-    }
-    .scanner-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 250px;
-      height: 250px;
-      transform: translate(-50%, -50%);
-      border: 3px solid rgba(255, 255, 255, 0.8);
-      border-radius: 10px;
-      box-shadow: 0 0 10px #000;
-      z-index: 10;
-      pointer-events: none;
     }
   </style>
 </head>
@@ -83,16 +69,11 @@
         <button type="submit" class="btn btn-primary px-4">Lacak</button>
       </form>
 
-      <!-- Tombol scan QR -->
       <div class="text-center mt-3">
         <button onclick="startScanner()" class="btn btn-outline-secondary btn-sm">Scan QR</button>
       </div>
 
-      <!-- Scanner view -->
-      <div id="reader" class="mt-3">
-        <div class="scanner-overlay"></div>
-      </div>
-
+      <div id="reader" class="mt-3"></div>
       <div id="result" class="mt-4"></div>
     </div>
   </div>
@@ -105,12 +86,12 @@
     &copy; 2025 <a href="https://instagram.com/insanln1" target="_blank" class="text-decoration-none">@insanln1</a>
   </footer>
 
-  <!-- Script -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lazarluis/html5-qrcode@1.0.12/html5-qrcode.min.js"></script>
+  <!-- QR code library -->
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script>
     const form = document.getElementById('trackerForm');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const transaction_no = document.getElementById('transaction_no').value;
@@ -152,32 +133,36 @@
     });
 
     let html5QrCode;
+
     async function startScanner() {
       const qrRegion = document.getElementById("reader");
       qrRegion.style.display = "block";
 
       try {
         const devices = await Html5Qrcode.getCameras();
-        if (!devices || devices.length === 0) throw new Error("Tidak ada kamera");
+        if (!devices || devices.length === 0) throw new Error("No camera found");
 
         html5QrCode = new Html5Qrcode("reader");
         await html5QrCode.start(
           { facingMode: "environment" },
-          { fps: 10 },
+          { fps: 10, qrbox: 250 },
           qrCodeMessage => {
             document.getElementById('transaction_no').value = qrCodeMessage;
-            html5QrCode.stop();
             qrRegion.style.display = "none";
+            html5QrCode.stop();
             form.requestSubmit();
           },
           errorMessage => {
-            // console.log("Scan error", errorMessage);
+            console.warn("QR scan error:", errorMessage);
           }
         );
       } catch (err) {
         alert("Gagal mengakses kamera: " + err.message);
+        console.error(err);
       }
     }
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
