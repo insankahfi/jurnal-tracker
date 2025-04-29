@@ -30,11 +30,6 @@ app.post('/track', async (req, res) => {
 
   const hmacHeader = `hmac username="${hmac_username}", algorithm="hmac-sha256", headers="date request-line", signature="${signature}"`;
 
-  console.log('[DEBUG] StringToSign:', stringToSign);
-  console.log('[DEBUG] Authorization:', hmacHeader);
-  console.log('[DEBUG] Date:', dateHeader);
-  console.log('[DEBUG] Full URL:', fullUrl);
-
   try {
     const response = await axios.get(fullUrl, {
       headers: {
@@ -55,10 +50,12 @@ app.post('/track', async (req, res) => {
     res.json({
       success: true,
       data: {
-        display_name: invoice.person?.display_name,
-        product: invoice.product?.name,
+        transaction_no: invoice.transaction_no,
         transaction_date: invoice.transaction_date,
-        quantity: invoice.transaction_lines_attributes?.[0]?.quantity ?? 0
+        ship_via: invoice.ship_via,
+        tags: invoice.tags || [],
+        person: invoice.person,
+        transaction_lines_attributes: invoice.transaction_lines_attributes || []
       }
     });
   } catch (err) {
@@ -66,7 +63,7 @@ app.post('/track', async (req, res) => {
     console.error('[ERROR DATA]', err.response?.data || err.message);
     res.status(500).json({
       success: false,
-      message: 'API Jurnal gagal: ' + (err.response?.data?.message || err.message)
+      message: 'Data tidak ditemukan: ' + (err.response?.data?.message || err.message)
     });
   }
 });
