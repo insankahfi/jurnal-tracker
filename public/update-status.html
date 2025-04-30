@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Status Bongkar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      max-width: 600px;
+      margin: 4rem auto;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card shadow">
+    <h4 class="mb-4 text-center">Update Status Bongkar</h4>
+
+    <form id="statusForm">
+      <div class="mb-3">
+        <label for="transaction_no" class="form-label">No Transaksi</label>
+        <input type="text" id="transaction_no" name="transaction_no" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="memo" class="form-label">Status Bongkar</label>
+        <select id="memo" name="memo" class="form-select" required>
+          <option value="">-- Pilih Status --</option>
+          <option value="Start">Start</option>
+          <option value="Proses Bongkar">Proses Bongkar</option>
+          <option value="Gagal Bongkar">Gagal Bongkar</option>
+          <option value="Selesai Bongkar">Selesai Bongkar</option>
+        </select>
+      </div>
+
+      <!-- Tombol Ambil Data -->
+      <div class="mb-3">
+        <button type="button" class="btn btn-secondary w-100" onclick="ambilData()">Ambil Data</button>
+      </div>
+
+      <!-- Tombol Submit -->
+      <button type="submit" class="btn btn-primary w-100">Kirim</button>
+    </form>
+
+    <div id="alertBox" class="alert mt-3 d-none" role="alert"></div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('statusForm');
+  const alertBox = document.getElementById('alertBox');
+  let currentInvoice = null;
+
+  async function ambilData() {
+    const transaction_no = document.getElementById('transaction_no').value.trim();
+    if (!transaction_no) {
+      alert("Masukkan nomor transaksi dulu.");
+      return;
+    }
+
+    const response = await fetch('/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transaction_no })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      currentInvoice = result.data;
+      alertBox.textContent = 'Data ditemukan untuk: ' + (currentInvoice.person?.display_name || 'tanpa nama');
+      alertBox.className = 'alert alert-info mt-3';
+      alertBox.classList.remove('d-none');
+    } else {
+      currentInvoice = null;
+      alertBox.textContent = 'Gagal ambil data: ' + result.message;
+      alertBox.className = 'alert alert-warning mt-3';
+      alertBox.classList.remove('d-none');
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertBox.classList.add('d-none');
+
+    const transaction_no = document.getElementById('transaction_no').value.trim();
+    const memo = document.getElementById('memo').value;
+
+    if (!currentInvoice) {
+      alertBox.textContent = 'Silakan ambil data dulu sebelum submit.';
+      alertBox.className = 'alert alert-warning mt-3';
+      alertBox.classList.remove('d-none');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/update-memo/${transaction_no}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memo })
+      });
+
+      const result = await response.json();
+
+      alertBox.textContent = result.message || (result.success ? 'Berhasil update status.' : 'Gagal update status.');
+      alertBox.className = `alert mt-3 ${result.success ? 'alert-success' : 'alert-danger'}`;
+      alertBox.classList.remove('d-none');
+
+      if (result.success) {
+        form.reset();
+        currentInvoice = null;
+      }
+
+    } catch (error) {
+      alertBox.textContent = 'Terjadi kesalahan saat mengirim data.';
+      alertBox.className = 'alert alert-danger mt-3';
+      alertBox.classList.remove('d-none');
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
