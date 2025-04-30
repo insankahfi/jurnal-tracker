@@ -87,6 +87,7 @@
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
+        <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
       </ul>
     </div>
   </div>
@@ -125,7 +126,7 @@
   </div>
 </div>
 
-<!-- Script dan Logic -->
+<!-- Script -->
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
   const form = document.getElementById('trackerForm');
@@ -146,8 +147,10 @@
 
     const result = await response.json();
     if (result.success) {
-      const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes } = result.data;
+      const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
       const tagText = (tags && tags.length > 0) ? tags[0] : '-';
+      const customerName = person?.display_name || '-';
+      const statusMemo = memo || '-';
 
       const itemsHtml = transaction_lines_attributes.map((item, i) => `
         <tr>
@@ -160,9 +163,11 @@
       outputDiv.innerHTML = `
         <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
         <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
+        <h6 class="text-danger">Status: ${statusMemo}</h6>
+        <p><strong>Nama Customer:</strong> ${customerName}</p>
 
         <table class="table table-bordered">
-          <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARVINDO TECH LESTARI</td></tr>
+          <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
           <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
         </table>
 
@@ -184,6 +189,8 @@
             <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
           </tbody>
         </table>
+
+        ${statusMemo.toLowerCase() === 'selesai bongkar' ? `<p style="color: red; font-weight: bold;">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
 
         <p>Lampung, ...............................................</p>
         <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
@@ -242,11 +249,11 @@
     const element = document.getElementById('result');
     element.classList.add('pdf-export');
     const opt = {
-      margin:       0.5,
-      filename:     `shipping-instruction-${new Date().getTime()}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      margin: 0.5,
+      filename: `shipping-instruction-${new Date().getTime()}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save().then(() => {
       element.classList.remove('pdf-export');
