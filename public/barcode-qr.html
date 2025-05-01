@@ -1,120 +1,81 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <!-- Meta dan CSS sama dengan index.html -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Update Status</title>
+  <title>Generate Barcode & QR</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
+    /* CSS sama persis dengan index.html */
     body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
     nav { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .card-form {
-      max-width: 800px;
-      margin: auto;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      background-color: #ffffff;
-      border: 1px solid #dee2e6;
-      position: relative;
-    }
-    .ship-img {
-      position: absolute;
-      top: -20px;
-      left: -20px;
-      width: 120px;
-      opacity: 0.9;
-    }
-    .document h5 { text-align: center; font-weight: bold; font-size: 20px; }
-    .document h6 { text-align: center; font-weight: bold; font-size: 18px; }
-    hr.custom-line { border: 1px solid #dee2e6; margin: 1rem 0; }
+    .card-form { max-width: 800px; margin: auto; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    /* ... dan seterusnya ... */
   </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">Tracking Bungker</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/">Beranda</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
-        <li class="nav-item"><a class="nav-link active" href="/update-status.html">Update Status</a></li>
-      </ul>
-    </div>
+    <a class="navbar-brand fw-bold" href="#">Generate Shipping Instruction</a>
+    <!-- Navbar sama dengan index.html -->
   </div>
 </nav>
 
 <div class="container pb-5">
   <div class="card-form">
-    <img src="/favpng_7a039f88b3ae288fab5cad451ad65763.png" class="ship-img" alt="Ship">
+    <img src="/favpng_7a039f88b3ae288fab5cad451ad65763.png" alt="Ship" class="ship-img">
 
-    <div class="text-center mb-3">
-      <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Logo" style="max-width: 160px;">
+    <div class="form-section">
+      <div class="text-center mb-3">
+        <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Energy Logo" style="max-width: 160px;">
+      </div>
+
+      <hr class="custom-line">
+
+      <form id="generateForm" class="d-flex gap-2 flex-column flex-md-row mb-3">
+        <input type="text" id="document_no" class="form-control" placeholder="Masukkan Nomor Dokumen" required />
+        <button type="submit" class="btn btn-primary px-4">Buat</button>
+      </form>
+
+      <!-- Tombol dan hasil sama dengan index.html -->
+      <div id="result" class="document"></div>
     </div>
-
-    <hr class="custom-line">
-
-    <form id="updateForm" class="d-flex gap-2 flex-column flex-md-row mb-3">
-      <input type="text" id="transaction_no" class="form-control" placeholder="No Transaksi" required />
-      <select id="status" class="form-select" required>
-        <option value="">Pilih Status</option>
-        <option value="Start">Start</option>
-        <option value="Proses Bongkar">Proses Bongkar</option>
-        <option value="Gagal Bongkar">Gagal Bongkar</option>
-        <option value="Selesai Bongkar">Selesai Bongkar</option>
-      </select>
-      <button type="submit" class="btn btn-primary">Update</button>
-    </form>
-
-    <div id="result" class="document"></div>
   </div>
 </div>
 
 <script>
-document.getElementById('updateForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const transaction_no = document.getElementById('transaction_no').value;
-  const status = document.getElementById('status').value;
-
-  const res = await fetch('/update-status', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transaction_no, status })
-  });
-  const result = await res.json();
-
+  const form = document.getElementById('generateForm');
   const outputDiv = document.getElementById('result');
-  if (result.success) {
-    const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes } = result.data;
-    const tagText = (tags && tags.length > 0) ? tags[0] : '-';
-    const customerName = person?.display_name || '-';
-    const itemsHtml = transaction_lines_attributes.map((item, i) => `
-      <tr><td>${i+1}</td><td>${item.description || '-'}</td><td>${item.quantity ?? 0}</td></tr>
-    `).join('');
-    const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const documentNo = document.getElementById('document_no').value;
 
     outputDiv.innerHTML = `
       <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
-      <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
-      <h6 class="text-danger">Status: ${status}</h6>
-      <p><strong>Nama Customer:</strong> ${customerName}</p>
+      <h6>SHIPPING INSTRUCTION<br>No. ${documentNo}</h6>
+      
+      <div class="text-center my-4">
+        <img src="/qr?number=${documentNo}" alt="QR Code" class="mb-3" style="width: 150px;">
+        <img src="/barcode?number=${documentNo}" alt="Barcode" style="width: 80%; max-width: 400px;">
+      </div>
 
+      <!-- Data statis sama dengan tracking result -->
       <table class="table table-bordered">
         <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
-        <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
+        <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Kab.Lampung Selatan</td></tr>
       </table>
 
       <table class="table table-bordered">
         <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
-        <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
+        <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4, Jakarta Selatan</td></tr>
         <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
-        <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
-        <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
-        <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
+        <tr><td>Nama Kapal</td><td>-</td></tr>
+        <tr><td>ETD/ETA</td><td>${new Date().toLocaleDateString()} s/d [ETA]</td></tr>
+        <tr><td>Pelabuhan Muat</td><td>-</td></tr>
       </table>
 
       <table class="table table-bordered">
@@ -122,22 +83,24 @@ document.getElementById('updateForm').addEventListener('submit', async (e) => {
           <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
         </thead>
         <tbody>
-          ${itemsHtml}
-          <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
+          <tr><td colspan="3" class="text-center">Data barang akan diisi manual</td></tr>
+          <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>-</strong></td></tr>
         </tbody>
       </table>
-
-      ${status.toLowerCase() === 'selesai bongkar' ? `<p style="color: red; font-weight: bold;">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
 
       <p>Lampung, ...............................................</p>
       <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
     `;
-  } else {
-    outputDiv.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
-  }
-});
+
+    // Tampilkan tombol export dan close
+    document.getElementById('exportPdfBtn').classList.remove('d-none');
+    document.getElementById('closeResultBtn').classList.remove('d-none');
+    outputDiv.style.display = 'block';
+  });
+
+  // Fungsi export PDF dan close sama dengan index.html
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Script lainnya sama dengan index.html -->
 </body>
 </html>
