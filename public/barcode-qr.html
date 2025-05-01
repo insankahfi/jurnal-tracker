@@ -3,137 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Generate Shipping Instruction</title>
+  <title>Update Status</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <style>
+    body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+    nav { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .card-form {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      position: relative;
+    }
+    .ship-img {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      width: 120px;
+      opacity: 0.9;
+    }
+    .document h5 { text-align: center; font-weight: bold; font-size: 20px; }
+    .document h6 { text-align: center; font-weight: bold; font-size: 18px; }
+    hr.custom-line { border: 1px solid #dee2e6; margin: 1rem 0; }
+  </style>
 </head>
-<body class="bg-light py-5">
+<body>
 
-  <div class="container text-center">
-    <!-- Logo -->
-    <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Energy Logo" class="mb-4" style="max-width: 160px; height: auto;" />
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">Tracking Bungker</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/update-status.html">Update Status</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-    <h2 class="text-primary mb-4">Generate Shipping Instruction</h2>
+<div class="container pb-5">
+  <div class="card-form">
+    <img src="/favpng_7a039f88b3ae288fab5cad451ad65763.png" class="ship-img" alt="Ship">
 
-    <form id="generateForm" class="d-flex justify-content-center mb-3 gap-2 flex-column flex-md-row">
-      <input type="text" id="document_no" class="form-control w-50" placeholder="Masukkan No Dokumen" required />
-      <button type="submit" class="btn btn-primary px-4">Buat</button>
-    </form>
-
-    <div class="d-flex justify-content-center gap-2 mb-4">
-      <button class="btn btn-danger btn-sm d-none" id="closeResultBtn" onclick="closeResult()">Tutup Data</button>
-      <button id="exportPdfBtn" class="btn btn-success btn-sm d-none">Export PDF</button>
+    <div class="text-center mb-3">
+      <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Logo" style="max-width: 160px;">
     </div>
 
-    <div id="result" class="mt-4"></div>
+    <hr class="custom-line">
+
+    <form id="updateForm" class="d-flex gap-2 flex-column flex-md-row mb-3">
+      <input type="text" id="transaction_no" class="form-control" placeholder="No Transaksi" required />
+      <select id="status" class="form-select" required>
+        <option value="">Pilih Status</option>
+        <option value="Start">Start</option>
+        <option value="Proses Bongkar">Proses Bongkar</option>
+        <option value="Gagal Bongkar">Gagal Bongkar</option>
+        <option value="Selesai Bongkar">Selesai Bongkar</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+
+    <div id="result" class="document"></div>
   </div>
+</div>
 
-  <script>
-    const form = document.getElementById('generateForm');
-    const outputDiv = document.getElementById('result');
-    const closeBtn = document.getElementById('closeResultBtn');
-    const exportBtn = document.getElementById('exportPdfBtn');
+<script>
+document.getElementById('updateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const transaction_no = document.getElementById('transaction_no').value;
+  const status = document.getElementById('status').value;
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const document_no = document.getElementById('document_no').value;
+  const res = await fetch('/update-status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transaction_no, status })
+  });
+  const result = await res.json();
 
-      outputDiv.innerHTML = `
-        <div class="text-center mb-4">
-          <h5 class="fw-bold">Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
-          <h6>SHIPPING INSTRUCTION</h6>
-          <h6 class="text-primary">No. ${document_no}</h6>
-        </div>
+  const outputDiv = document.getElementById('result');
+  if (result.success) {
+    const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes } = result.data;
+    const tagText = (tags && tags.length > 0) ? tags[0] : '-';
+    const customerName = person?.display_name || '-';
+    const itemsHtml = transaction_lines_attributes.map((item, i) => `
+      <tr><td>${i+1}</td><td>${item.description || '-'}</td><td>${item.quantity ?? 0}</td></tr>
+    `).join('');
+    const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
-        <div class="table-responsive mb-4">
-          <table class="table table-bordered table-striped">
-            <thead class="table-primary">
-              <tr>
-                <th>Nama Pemilik/Pengirim Barang</th>
-                <th>Alamat Perusahaan</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>PT. ARIVINDO TECH LESTARI</td>
-                <td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab. Lampung Selatan</td>
-              </tr>
-            </tbody>
-          </table>
+    outputDiv.innerHTML = `
+      <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
+      <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
+      <h6 class="text-danger">Status: ${status}</h6>
+      <p><strong>Nama Customer:</strong> ${customerName}</p>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-primary">
-              <tr>
-                <th>Tanggal Transaksi</th>
-                <th>Quantity (liter)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>${new Date().toLocaleDateString('id-ID')}</td>
-                <td>...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <table class="table table-bordered">
+        <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
+        <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
+      </table>
 
-        <div class="text-center mb-4">
-          <div id="qrcode" class="mb-3"></div>
-          <svg id="barcode"></svg>
-        </div>
+      <table class="table table-bordered">
+        <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
+        <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
+        <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
+        <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
+        <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
+        <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
+      </table>
 
-        <div class="mt-4">
-          <p>Lampung, ...............................................</p>
-          <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARIVINDO TECH LESTARI</p>
-        </div>
-      `;
+      <table class="table table-bordered">
+        <thead class="table-primary">
+          <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+          <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
+        </tbody>
+      </table>
 
-      // QR Code
-      document.getElementById("qrcode").innerHTML = "";
-      new QRCode(document.getElementById("qrcode"), {
-        text: document_no,
-        width: 128,
-        height: 128
-      });
+      ${status.toLowerCase() === 'selesai bongkar' ? `<p style="color: red; font-weight: bold;">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
 
-      // Barcode
-      JsBarcode("#barcode", document_no, {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 2,
-        height: 60,
-        displayValue: true
-      });
+      <p>Lampung, ...............................................</p>
+      <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
+    `;
+  } else {
+    outputDiv.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
+  }
+});
+</script>
 
-      outputDiv.style.display = 'block';
-      closeBtn.classList.remove('d-none');
-      exportBtn.classList.remove('d-none');
-    });
-
-    function closeResult() {
-      outputDiv.style.display = 'none';
-      closeBtn.classList.add('d-none');
-      exportBtn.classList.add('d-none');
-    }
-
-    document.getElementById('exportPdfBtn').addEventListener('click', () => {
-      const element = document.getElementById('result');
-      element.classList.add('pdf-export');
-      const opt = {
-        margin: 0.5,
-        filename: `shipping-instruction-${new Date().getTime()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save().then(() => {
-        element.classList.remove('pdf-export');
-      });
-    });
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
