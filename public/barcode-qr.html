@@ -79,6 +79,13 @@
       gap: 2rem;
       margin: 2rem 0;
     }
+    /* Ensure PDF fits on one page */
+    .document {
+      page-break-inside: avoid;
+    }
+    .table {
+      page-break-inside: avoid;
+    }
   </style>
 </head>
 <body>
@@ -93,17 +100,18 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
-        <li class="nav-item"><a class="nav-link" href="/barcode-qr.html">Create SI</a></li>
         <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
       </ul>
     </div>
   </div>
 </nav>
-  <div class="container pb-5">
+
+<div class="container pb-5">
   <div class="card-form">
-    
+    <img src="/favpng_7a039f88b3ae288fab5cad451ad65763.png" alt="Ship" class="ship-img">
+
     <div class="form-section">
       <div class="text-center mb-3">
         <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Energy Logo" style="max-width: 160px;">
@@ -155,7 +163,7 @@
       const itemsHtml = transaction_lines_attributes.map((item, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${item.description || '-'}</td>
+          <td>${item.product?.name || item.description || '-'}</td>
           <td>${item.quantity ?? 0}</td>
         </tr>`).join('');
       const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
@@ -212,9 +220,9 @@
       });
 
       // Generate QR Code
-      const qrCodeElement = document.getElementById('qrcode');
-      qrCodeElement.innerHTML = '';
-      new QRCode(qrCodeElement, {
+      const qrcodeElement = document.getElementById('qrcode');
+      qrcodeElement.innerHTML = '';
+      new QRCode(qrcodeElement, {
         text: transaction_no,
         width: 128,
         height: 128,
@@ -240,14 +248,37 @@
     const element = document.getElementById('result');
     element.classList.add('pdf-export');
     const opt = {
-      margin: 0.5,
+      margin: [10, 5],
       filename: `shipping-instruction-${new Date().getTime()}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      html2canvas: { 
+        scale: 2,
+        scrollY: 0,
+        windowHeight: element.scrollHeight
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: true
+      },
+      pagebreak: { avoid: '.document, .table' }
     };
+    
+    // Force single page by adjusting content
+    const originalContent = element.innerHTML;
+    const tempContent = document.createElement('div');
+    tempContent.innerHTML = originalContent;
+    
+    // Remove any elements that might cause page breaks
+    const elementsToRemove = tempContent.querySelectorAll('.page-break');
+    elementsToRemove.forEach(el => el.remove());
+    
+    element.innerHTML = tempContent.innerHTML;
+    
     html2pdf().set(opt).from(element).save().then(() => {
       element.classList.remove('pdf-export');
+      element.innerHTML = originalContent; // Restore original content
     });
   });
 </script>
