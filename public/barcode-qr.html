@@ -100,8 +100,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Beranda</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
+        <li class="nav-item"><a class="nav-link" href="/update-status.html">Create SI</a></li>
         <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
       </ul>
     </div>
@@ -110,7 +111,6 @@
 
 <div class="container pb-5">
   <div class="card-form">
-    <img src="/favpng_7a039f88b3ae288fab5cad451ad65763.png" alt="Ship" class="ship-img">
 
     <div class="form-section">
       <div class="text-center mb-3">
@@ -179,8 +179,7 @@
           <div id="qrcode"></div>
         </div>
 
-        <h6 class="text-danger">Status: ${statusMemo}</h6>
-        <p><strong>Nama Customer:</strong> ${customerName}</p>
+                <p><strong>Nama Customer:</strong> ${customerName}</p>
 
         <table class="table table-bordered">
           <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
@@ -206,10 +205,8 @@
           </tbody>
         </table>
 
-        ${statusMemo.toLowerCase() === 'selesai bongkar' ? `<p style="color: red; font-weight: bold;">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
-
         <p>Lampung, ...............................................</p>
-        <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
+        <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARIVINDO TECH LESTARI</p>
       `;
 
       // Generate Barcode
