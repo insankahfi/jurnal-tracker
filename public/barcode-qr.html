@@ -1,26 +1,103 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <!-- Meta dan CSS sama dengan index.html -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Generate Barcode & QR</title>
+  <title>Tracking Bungker</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    /* CSS sama persis dengan index.html */
-    body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
-    nav { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .card-form { max-width: 800px; margin: auto; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    /* ... dan seterusnya ... */
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    nav {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card-form {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+      position: relative;
+      border: 1px solid #dee2e6;
+    }
+    .document h5 {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .document h6 {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .document .table td, .document .table th {
+      vertical-align: middle;
+    }
+    #result {
+      display: none;
+      margin-top: 1rem;
+    }
+    .btn-close-custom {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
+    }
+    #result.pdf-export {
+      background: white;
+      padding: 20px;
+      max-width: 794px;
+      margin: auto;
+    }
+    .ship-img {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      width: 120px;
+      opacity: 0.9;
+      z-index: 0;
+    }
+    .form-section {
+      position: relative;
+      z-index: 1;
+    }
+    hr.custom-line {
+      border: 1px solid #dee2e6;
+      margin: 1rem 0;
+    }
+    .barcode-qr-container {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
   </style>
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">Generate Shipping Instruction</a>
-    <!-- Navbar sama dengan index.html -->
+    <a class="navbar-brand fw-bold" href="#">Tracking Bungker</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
+        <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 
@@ -35,72 +112,147 @@
 
       <hr class="custom-line">
 
-      <form id="generateForm" class="d-flex gap-2 flex-column flex-md-row mb-3">
-        <input type="text" id="document_no" class="form-control" placeholder="Masukkan Nomor Dokumen" required />
-        <button type="submit" class="btn btn-primary px-4">Buat</button>
+      <form id="trackerForm" class="d-flex gap-2 flex-column flex-md-row mb-3">
+        <input type="text" id="transaction_no" class="form-control" placeholder="Masukkan No Transaksi" required />
+        <button type="submit" class="btn btn-primary px-4">Create Shipping Instruction</button>
       </form>
 
-      <!-- Tombol dan hasil sama dengan index.html -->
+      <div class="d-flex justify-content-end mb-2">
+        <button class="btn btn-danger btn-sm d-none" id="closeResultBtn" onclick="closeResult()">Tutup Data</button>
+      </div>
+
+      <div class="d-flex justify-content-end mb-3">
+        <button id="exportPdfBtn" class="btn btn-success d-none">Export PDF</button>
+      </div>
+
       <div id="result" class="document"></div>
     </div>
   </div>
 </div>
 
 <script>
-  const form = document.getElementById('generateForm');
+  const form = document.getElementById('trackerForm');
   const outputDiv = document.getElementById('result');
-  
-  form.addEventListener('submit', (e) => {
+  const closeBtn = document.getElementById('closeResultBtn');
+  const exportBtn = document.getElementById('exportPdfBtn');
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const documentNo = document.getElementById('document_no').value;
+    const transaction_no = document.getElementById('transaction_no').value;
 
-    outputDiv.innerHTML = `
-      <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
-      <h6>SHIPPING INSTRUCTION<br>No. ${documentNo}</h6>
-      
-      <div class="text-center my-4">
-        <img src="/qr?number=${documentNo}" alt="QR Code" class="mb-3" style="width: 150px;">
-        <img src="/barcode?number=${documentNo}" alt="Barcode" style="width: 80%; max-width: 400px;">
-      </div>
+    const response = await fetch('/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transaction_no })
+    });
 
-      <!-- Data statis sama dengan tracking result -->
-      <table class="table table-bordered">
-        <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
-        <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Kab.Lampung Selatan</td></tr>
-      </table>
+    const result = await response.json();
+    if (result.success) {
+      const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
+      const tagText = (tags && tags.length > 0) ? tags[0] : '-';
+      const customerName = person?.display_name || '-';
+      const statusMemo = memo || '-';
 
-      <table class="table table-bordered">
-        <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
-        <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4, Jakarta Selatan</td></tr>
-        <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
-        <tr><td>Nama Kapal</td><td>-</td></tr>
-        <tr><td>ETD/ETA</td><td>${new Date().toLocaleDateString()} s/d [ETA]</td></tr>
-        <tr><td>Pelabuhan Muat</td><td>-</td></tr>
-      </table>
+      const itemsHtml = transaction_lines_attributes.map((item, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${item.description || '-'}</td>
+          <td>${item.quantity ?? 0}</td>
+        </tr>`).join('');
+      const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
-      <table class="table table-bordered">
-        <thead class="table-primary">
-          <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="3" class="text-center">Data barang akan diisi manual</td></tr>
-          <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>-</strong></td></tr>
-        </tbody>
-      </table>
+      outputDiv.innerHTML = `
+        <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
+        <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
+        
+        <div class="barcode-qr-container">
+          <div>
+            <svg id="barcode"></svg>
+          </div>
+          <div id="qrcode"></div>
+        </div>
 
-      <p>Lampung, ...............................................</p>
-      <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
-    `;
+        <h6 class="text-danger">Status: ${statusMemo}</h6>
+        <p><strong>Nama Customer:</strong> ${customerName}</p>
 
-    // Tampilkan tombol export dan close
-    document.getElementById('exportPdfBtn').classList.remove('d-none');
-    document.getElementById('closeResultBtn').classList.remove('d-none');
-    outputDiv.style.display = 'block';
+        <table class="table table-bordered">
+          <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
+          <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
+        </table>
+
+        <table class="table table-bordered">
+          <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
+          <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
+          <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
+          <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
+          <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
+          <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
+        </table>
+
+        <table class="table table-bordered">
+          <thead class="table-primary">
+            <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+            <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
+          </tbody>
+        </table>
+
+        ${statusMemo.toLowerCase() === 'selesai bongkar' ? `<p style="color: red; font-weight: bold;">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
+
+        <p>Lampung, ...............................................</p>
+        <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
+      `;
+
+      // Generate Barcode
+      JsBarcode("#barcode", transaction_no, {
+        format: "CODE128",
+        displayValue: true,
+        fontSize: 16,
+      });
+
+      // Generate QR Code
+      const qrCodeElement = document.getElementById('qrcode');
+      qrCodeElement.innerHTML = '';
+      new QRCode(qrCodeElement, {
+        text: transaction_no,
+        width: 128,
+        height: 128,
+      });
+
+      outputDiv.style.display = 'block';
+      closeBtn.classList.remove('d-none');
+      exportBtn.classList.remove('d-none');
+    } else {
+      outputDiv.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
+      outputDiv.style.display = 'block';
+      closeBtn.classList.remove('d-none');
+    }
   });
 
-  // Fungsi export PDF dan close sama dengan index.html
+  function closeResult() {
+    outputDiv.style.display = 'none';
+    closeBtn.classList.add('d-none');
+    exportBtn.classList.add('d-none');
+  }
+
+  document.getElementById('exportPdfBtn').addEventListener('click', () => {
+    const element = document.getElementById('result');
+    element.classList.add('pdf-export');
+    const opt = {
+      margin: 0.5,
+      filename: `shipping-instruction-${new Date().getTime()}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(() => {
+      element.classList.remove('pdf-export');
+    });
+  });
 </script>
 
-<!-- Script lainnya sama dengan index.html -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
