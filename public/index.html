@@ -3,94 +3,297 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tracking Bungker</title>
+  <title>Tracking Bungker - Modern Design</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <style>
+    :root {
+      --primary-color: #0A4D68; /* Biru Tua Kehijauan */
+      --secondary-color: #088395; /* Teal */
+      --accent-color: #F5A31A; /* Kuning/Oranye Aksen */
+      --light-bg: #F8F9FA;
+      --dark-text: #212529;
+      --light-text: #FFFFFF;
+      --border-radius-md: 0.5rem; /* 8px */
+      --border-radius-lg: 0.75rem; /* 12px */
+    }
+
     body {
-      background-color: #f8f9fa;
-      font-family: Arial, sans-serif;
+      background-color: var(--light-bg);
+      font-family: 'Roboto', Arial, sans-serif;
+      color: var(--dark-text);
+      line-height: 1.6;
     }
-    nav {
+
+    h1, h2, h3, h4, h5, h6, .navbar-brand, .btn, .form-label {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Navbar Modern */
+    .navbar {
       background-color: #ffffff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding-top: 1rem;
+      padding-bottom: 1rem;
     }
+    .navbar-brand {
+      font-weight: 600;
+      color: var(--primary-color) !important;
+    }
+    .navbar-brand i {
+        margin-right: 0.5rem;
+        color: var(--secondary-color);
+    }
+    .nav-link {
+      font-weight: 500;
+      color: #555 !important;
+      transition: color 0.2s ease-in-out;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--secondary-color) !important;
+    }
+
+    /* Card Form */
     .card-form {
       max-width: 800px;
-      margin: auto;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin: 2.5rem auto; /* Lebih banyak spasi atas bawah */
+      padding: 2.5rem; /* Padding lebih besar */
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Shadow lebih soft dan menyebar */
       background-color: #ffffff;
-      position: relative;
-      border: 1px solid #dee2e6;
+      border: none; /* Hilangkan border default */
     }
-    .document h5 {
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
+
+    .logo-container {
+        text-align: center;
+        margin-bottom: 1.5rem;
     }
-    .document h6 {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 1rem;
+    .logo-container img {
+        max-width: 150px; /* Sesuaikan jika perlu */
+        border-radius: 8px; /* Jika logo Anda cocok dengan border-radius */
     }
-    .document .table td, .document .table th {
-      vertical-align: middle;
+
+    hr.custom-line {
+      border: 0;
+      height: 1px;
+      background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.1), rgba(0,0,0,0));
+      margin: 2rem 0; /* Spasi lebih */
     }
+
+    /* Form Elements */
+    .form-control {
+      border-radius: var(--border-radius-md);
+      padding: 0.85rem 1.15rem; /* Padding lebih nyaman */
+      border: 1px solid #ced4da;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.25rem rgba(var(--secondary-color-rgb, 8, 131, 149), 0.25); /* Gunakan RGB untuk opacity */
+    }
+
+    .btn {
+      border-radius: var(--border-radius-md);
+      padding: 0.8rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.25s ease-out;
+      text-transform: none; /* Atau uppercase jika lebih suka */
+      letter-spacing: 0.3px;
+    }
+    .btn i {
+      margin-right: 0.5rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    .btn-primary:hover {
+      background-color: #083D56; /* Warna lebih gelap saat hover */
+      border-color: #083D56;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(10, 77, 104, 0.3);
+    }
+
+    .btn-outline-secondary {
+      border-color: var(--secondary-color);
+      color: var(--secondary-color);
+    }
+    .btn-outline-secondary:hover {
+      background-color: var(--secondary-color);
+      color: var(--light-text);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(var(--secondary-color-rgb, 8, 131, 149),0.2);
+    }
+    
+    .btn-success {
+        background-color: #198754; /* Default Bootstrap green */
+        border-color: #198754;
+    }
+    .btn-success:hover {
+        background-color: #157347;
+        border-color: #146c43;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+    }
+
+    .btn-danger {
+        background-color: #dc3545; /* Default Bootstrap red */
+        border-color: #dc3545;
+    }
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+
+    /* QR Reader & Result Area */
     #reader {
       display: none;
       max-width: 400px;
-      margin: auto;
+      margin: 1.5rem auto;
+      border: 2px dashed var(--secondary-color);
+      border-radius: var(--border-radius-md);
+      padding: 1rem;
+      background-color: #fdfdff;
     }
+
     #result {
       display: none;
-      margin-top: 1rem;
+      margin-top: 2rem;
+      padding: 2rem;
+      border-radius: var(--border-radius-md);
+      background-color: #f7f9fc;
+      border: 1px solid #e3e9ef;
+      animation: fadeInResult 0.5s ease-out;
     }
-    .btn-close-custom {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      z-index: 10;
+    @keyframes fadeInResult {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+
+    .document h5, .document h6 {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    .document h5 {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+    .document h6 {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .document .table {
+      margin-bottom: 1.5rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+      border-radius: var(--border-radius-md);
+      overflow: hidden; /* Agar border-radius tabel terlihat */
+    }
+    .document .table th {
+      background-color: var(--primary-color);
+      color: var(--light-text);
+      font-weight: 600;
+      padding: 0.9rem 1rem;
+    }
+    .document .table td {
+      padding: 0.9rem 1rem;
+      vertical-align: middle;
+    }
+    .document .table-bordered {
+        border: 1px solid #dee2e6;
+    }
+    .document .table-bordered th, .document .table-bordered td {
+        border: 1px solid #dee2e6;
+    }
+    .document .table-hover tbody tr:hover {
+        background-color: rgba(var(--secondary-color-rgb, 8, 131, 149), 0.05);
+    }
+
+    .document strong {
+        font-weight: 500; /* Roboto 500 atau Poppins 500 */
+    }
+    .document .text-danger {
+        color: #dc3545 !important; /* Bootstrap's default danger color */
+    }
+
+    /* Tombol Aksi (Export, Tutup) */
+    .action-buttons-container {
+        display: flex;
+        justify-content: flex-end; /* Posisikan ke kanan */
+        gap: 0.75rem; /* Jarak antar tombol */
+        margin-bottom: 1rem; /* Jarak sebelum hasil */
+    }
+    .action-buttons-container .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
     #result.pdf-export {
       background: white;
       padding: 20px;
       max-width: 794px;
       margin: auto;
     }
-    .ship-img {
-      position: absolute;
-      top: -20px;
-      left: -20px;
-      width: 120px;
-      opacity: 0.9;
-      z-index: 0;
+    
+    /* Simple Loading Spinner */
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
     }
-    .form-section {
-      position: relative;
-      z-index: 1;
+    .loading-spinner .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        color: var(--primary-color);
     }
-    hr.custom-line {
-      border: 1px solid #dee2e6;
-      margin: 1rem 0;
+
+    /* Footer (opsional) */
+    .footer {
+        background-color: var(--primary-color);
+        color: rgba(255,255,255,0.8);
+        padding: 2rem 0;
+        text-align: center;
+        margin-top: 4rem;
+        font-size: 0.9rem;
+    }
+    .footer p {
+        margin-bottom: 0.25rem;
+    }
+    .footer a {
+        color: var(--light-text);
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .footer a:hover {
+        text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-<!-- ✅ Navbar responsif -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+<nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">Tracking Bungker</a>
+    <a class="navbar-brand" href="#"><i class="fas fa-ship"></i> Tracking Bungker</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#">Beranda</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
         <li class="nav-item"><a class="nav-link" href="/barcode-qr.html">Create SI</a></li>
         <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
@@ -101,36 +304,40 @@
 
 <div class="container pb-5">
   <div class="card-form">
+    <div class="logo-container">
+      <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Energy Logo" style="max-width: 160px;">
+    </div>
+
+    <hr class="custom-line">
 
     <div class="form-section">
-      <div class="text-center mb-3">
-        <img src="LOGO ATL_1024X1024.jpeg" alt="ATL Energy Logo" style="max-width: 160px;">
-      </div>
-
-      <hr class="custom-line">
-
-      <form id="trackerForm" class="d-flex gap-2 flex-column flex-md-row mb-3">
-        <input type="text" id="transaction_no" class="form-control" placeholder="Masukkan No Transaksi" required />
-        <button type="submit" class="btn btn-primary px-4">Lacak</button>
-        <button type="button" onclick="startScanner()" class="btn btn-outline-secondary">Scan QR</button>
+      <form id="trackerForm" class="d-flex gap-3 flex-column flex-md-row mb-3">
+        <input type="text" id="transaction_no" class="form-control form-control-lg" placeholder="Masukkan No Transaksi Anda" required />
+        <button type="submit" class="btn btn-primary btn-lg px-4"><i class="fas fa-search"></i> Lacak</button>
+        <button type="button" onclick="startScanner()" class="btn btn-outline-secondary btn-lg"><i class="fas fa-qrcode"></i> Scan QR</button>
       </form>
 
       <div id="reader"></div>
 
-      <div class="d-flex justify-content-end mb-2">
-        <button class="btn btn-danger btn-sm d-none" id="closeResultBtn" onclick="closeResult()">Tutup Data</button>
+      <div class="action-buttons-container">
+        <button id="exportPdfBtn" class="btn btn-success btn-sm d-none"><i class="fas fa-file-pdf"></i> Export PDF</button>
+        <button class="btn btn-danger btn-sm d-none" id="closeResultBtn" onclick="closeResult()"><i class="fas fa-times-circle"></i> Tutup Data</button>
       </div>
-
-      <div class="d-flex justify-content-end mb-3">
-        <button id="exportPdfBtn" class="btn btn-success d-none">Export PDF</button>
-      </div>
-
-      <div id="result" class="document"></div>
+      
+      <div id="result" class="document">
+          </div>
     </div>
   </div>
 </div>
 
-<!-- Script -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; <span id="currentYear"></span> PT. ARIVINDO TECH LESTARI. Hak Cipta Dilindungi.</p>
+        <p>Didukung oleh Teknologi Modern untuk Pelacakan Akurat</p>
+    </div>
+</footer>
+
+
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
   const form = document.getElementById('trackerForm');
@@ -139,128 +346,241 @@
   const closeBtn = document.getElementById('closeResultBtn');
   const exportBtn = document.getElementById('exportPdfBtn');
 
+  // Untuk tahun di footer
+  if (document.getElementById('currentYear')) {
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  }
+  
+  // Untuk --secondary-color-rgb (digunakan di box-shadow focus)
+  // Ekstrak RGB dari variabel CSS --secondary-color
+  const secondaryColorHex = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+  function hexToRgb(hex) {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
+  }
+  if (secondaryColorHex) {
+    const rgb = hexToRgb(secondaryColorHex);
+    if (rgb) {
+        document.documentElement.style.setProperty('--secondary-color-rgb', rgb);
+    }
+  }
+
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const transaction_no = document.getElementById('transaction_no').value;
 
-    const response = await fetch('/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transaction_no })
-    });
+    // Tampilkan loading spinner
+    outputDiv.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>`;
+    outputDiv.style.display = 'block';
+    closeBtn.classList.add('d-none'); 
+    exportBtn.classList.add('d-none'); 
 
-    const result = await response.json();
-    if (result.success) {
-      const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
-      const tagText = (tags && tags.length > 0) ? tags[0] : '-';
-      const customerName = person?.display_name || '-';
-      const statusMemo = memo || '-';
+    try {
+        const response = await fetch('/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transaction_no })
+        });
 
-      const itemsHtml = transaction_lines_attributes.map((item, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${item.description || '-'}</td>
-          <td>${item.quantity ?? 0}</td>
-        </tr>`).join('');
-      const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        // Tambahkan delay untuk melihat spinner (hapus di produksi)
+        // await new Promise(resolve => setTimeout(resolve, 1500)); 
 
-      outputDiv.innerHTML = `
-        <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
-        <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
-        <h6 class="text-danger">Status: ${statusMemo}</h6>
-        <p><strong>Nama Customer:</strong> ${customerName}</p>
+        if (!response.ok) {
+            const errorResult = await response.json().catch(() => ({ message: `Error: ${response.status} ${response.statusText}` }));
+            throw new Error(errorResult.message || `Gagal mengambil data. Status: ${response.status}`);
+        }
 
-        <table class="table table-bordered">
-          <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
-          <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
-        </table>
+        const result = await response.json();
+        if (result.success && result.data) {
+            const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
+            const tagText = (tags && tags.length > 0) ? tags[0] : '-';
+            const customerName = person?.display_name || '-';
+            const statusMemo = memo || '-';
 
-        <table class="table table-bordered">
-          <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
-          <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
-          <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
-          <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
-          <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
-          <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
-        </table>
+            const itemsHtml = transaction_lines_attributes.map((item, i) => `
+                <tr>
+                <td>${i + 1}</td>
+                <td>${item.description || '-'}</td>
+                <td>${item.quantity ?? 0}</td>
+                </tr>`).join('');
+            const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
-        <table class="table table-bordered">
-          <thead class="table-primary">
-            <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-            <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
-          </tbody>
-        </table>
+            outputDiv.innerHTML = `
+                <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
+                <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
+                <h6 style="color: ${statusMemo.toLowerCase() === 'selesai bongkar' ? '#dc3545' : '#198754'};">Status: ${statusMemo}</h6>
+                <p><strong>Nama Customer:</strong> ${customerName}</p>
 
-        ${statusMemo.toLowerCase() === 'selesai bongkar' ? `<p style="color: red; font-weight: bold;">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
+                <table class="table table-bordered table-hover">
+                <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
+                <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
+                </table>
 
-        <p>Lampung, ...............................................</p>
-        <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
-      `;
+                <table class="table table-bordered table-hover">
+                <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
+                <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
+                <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
+                <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
+                <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
+                <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
+                </table>
 
-      outputDiv.style.display = 'block';
-      closeBtn.classList.remove('d-none');
-      exportBtn.classList.remove('d-none');
-    } else {
-      outputDiv.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
-      outputDiv.style.display = 'block';
-      closeBtn.classList.remove('d-none');
+                <table class="table table-bordered table-hover">
+                <thead> <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                    <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
+                </tbody>
+                </table>
+
+                ${statusMemo.toLowerCase() === 'selesai bongkar' ? `<p class="text-danger fw-bold mt-3">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
+
+                <p class="mt-4">Lampung, ...............................................</p>
+                <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
+            `;
+
+            outputDiv.style.display = 'block';
+            closeBtn.classList.remove('d-none');
+            exportBtn.classList.remove('d-none');
+        } else {
+            const message = result.message || 'Data tidak ditemukan atau terjadi kesalahan.';
+            outputDiv.innerHTML = `<div class="alert alert-warning text-center"><i class="fas fa-exclamation-triangle me-2"></i>${message}</div>`;
+            outputDiv.style.display = 'block';
+            closeBtn.classList.remove('d-none');
+            exportBtn.classList.add('d-none');
+        }
+    } catch (error) {
+        console.error("Fetch error:", error);
+        outputDiv.innerHTML = `<div class="alert alert-danger text-center"><i class="fas fa-times-circle me-2"></i>Terjadi kesalahan: ${error.message}</div>`;
+        outputDiv.style.display = 'block';
+        closeBtn.classList.remove('d-none');
+        exportBtn.classList.add('d-none');
     }
   });
 
   function closeResult() {
     outputDiv.style.display = 'none';
+    outputDiv.innerHTML = ''; // Kosongkan isi agar animasi fadein berjalan lagi saat data baru
     closeBtn.classList.add('d-none');
     exportBtn.classList.add('d-none');
+    document.getElementById('transaction_no').value = ''; 
+    document.getElementById('transaction_no').focus(); 
   }
 
   let html5QrCode;
 
   async function startScanner() {
+    const scanButton = document.querySelector('button[onclick="startScanner()"]');
+    const originalButtonHtml = '<i class="fas fa-qrcode"></i> Scan QR';
+    const stopButtonHtml = '<i class="fas fa-stop-circle"></i> Hentikan Scan';
+
     if (readerDiv.style.display === 'block') {
       readerDiv.style.display = 'none';
-      if (html5QrCode) html5QrCode.stop();
+      if (html5QrCode && html5QrCode.getState() === Html5Qrcode.SCANNING_STATE) { 
+        try {
+            await html5QrCode.stop();
+        } catch (err) {
+            console.error("Error stopping QR scanner:", err);
+        }
+      }
+      scanButton.innerHTML = originalButtonHtml;
+      scanButton.classList.remove('btn-danger');
+      scanButton.classList.add('btn-outline-secondary');
       return;
     }
 
     try {
       const devices = await Html5Qrcode.getCameras();
-      if (!devices || devices.length === 0) throw new Error("No camera found");
+      if (!devices || devices.length === 0) {
+          alert("Tidak ada kamera yang ditemukan. Pastikan Anda memberikan izin akses kamera.");
+          return;
+      }
 
       html5QrCode = new Html5Qrcode("reader");
       readerDiv.style.display = 'block';
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        qrCodeMessage => {
-          document.getElementById('transaction_no').value = qrCodeMessage;
+      scanButton.innerHTML = stopButtonHtml;
+      scanButton.classList.remove('btn-outline-secondary');
+      scanButton.classList.add('btn-danger');
+
+      const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
+          document.getElementById('transaction_no').value = decodedText;
           readerDiv.style.display = 'none';
-          html5QrCode.stop();
-          form.requestSubmit();
-        },
-        errorMessage => {
-          console.warn("QR scan error:", errorMessage);
+          scanButton.innerHTML = originalButtonHtml;
+          scanButton.classList.remove('btn-danger');
+          scanButton.classList.add('btn-outline-secondary');
+          if (html5QrCode && html5QrCode.getState() === Html5Qrcode.SCANNING_STATE) {
+            try {
+                await html5QrCode.stop();
+            } catch(err) { console.error("Error stopping after success", err); }
+          }
+          form.requestSubmit(); 
+      };
+
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } }; 
+
+      await html5QrCode.start(
+        { facingMode: "environment" }, 
+        config,
+        qrCodeSuccessCallback,
+        (errorMessage) => {
+          if (!errorMessage.toLowerCase().includes("qr code parse error")) {
+            console.warn("QR scan error:", errorMessage);
+          }
         }
       );
     } catch (err) {
-      alert("Gagal mengakses kamera: " + err.message);
+      console.error("Gagal memulai scanner atau mengakses kamera:", err);
+      alert("Gagal mengakses kamera: " + err.message + "\nPastikan Anda memberikan izin akses kamera di pengaturan browser Anda.");
+      readerDiv.style.display = 'none';
+      scanButton.innerHTML = originalButtonHtml;
+      scanButton.classList.remove('btn-danger');
+      scanButton.classList.add('btn-outline-secondary');
     }
   }
 
   document.getElementById('exportPdfBtn').addEventListener('click', () => {
     const element = document.getElementById('result');
-    element.classList.add('pdf-export');
+    const originalTitle = document.title;
+    const transactionNoElement = element.querySelector('h6'); 
+    let fileName = `shipping-instruction-${Date.now()}.pdf`; 
+
+    if (transactionNoElement && transactionNoElement.innerText.includes('No.')) {
+        const transactionNoText = transactionNoElement.innerText.split('No.')[1]?.trim();
+        if (transactionNoText) {
+            const safeTransactionNo = transactionNoText.replace(/[^a-zA-Z0-9.-]/g, '_');
+            fileName = `SI_${safeTransactionNo}.pdf`;
+        }
+    }
+    document.title = fileName.replace('.pdf', ''); 
+
+    element.classList.add('pdf-export'); 
+
     const opt = {
-      margin: 0.5,
-      filename: `shipping-instruction-${new Date().getTime()}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      margin:       [0.5, 0.4, 0.5, 0.4], // [top, left, bottom, right] in inches
+      filename:     fileName,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight},
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
-    html2pdf().set(opt).from(element).save().then(() => {
+
+    html2pdf().from(element).set(opt).save().then(() => {
       element.classList.remove('pdf-export');
+      document.title = originalTitle; 
+    }).catch(err => {
+        console.error("Error exporting PDF:", err);
+        element.classList.remove('pdf-export');
+        document.title = originalTitle;
+        alert("Gagal mengekspor PDF. Silakan coba lagi.");
     });
   });
 </script>
