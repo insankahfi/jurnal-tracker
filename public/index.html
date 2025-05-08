@@ -408,7 +408,7 @@
             const itemsHtml = transaction_lines_attributes.map((item, i) => `
                 <tr>
                 <td>${i + 1}</td>
-                <td>${item.description || '-'}</td>
+                <td>${item.product.name || '-'}</td>
                 <td>${item.quantity ?? 0}</td>
                 </tr>`).join('');
             const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
