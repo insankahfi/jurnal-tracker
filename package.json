@@ -7,10 +7,11 @@
   },
   "dependencies": {
     "axios": "^1.8.4",
-    "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "node-fetch": "^3.3.2"
+    "express-session": "^1.17.3",  // <-- TAMBAHKAN INI
+    "node-fetch": "^3.3.2"       // Bisa dipertimbangkan untuk dihapus jika tidak dipakai
+                                  // dan hanya menggunakan axios atau fetch global Node.js
   },
   "keywords": [],
   "author": "",
