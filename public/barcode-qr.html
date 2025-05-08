@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <!-- Meta, CSS, dan Library sama persis dengan index.html -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create SI - ATL Energy</title>
@@ -12,62 +11,326 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Library untuk QR Code dan Barcode -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
   <style>
-    /* Styles sama persis dengan index.html */
+    /* Root variables for consistent colors, spacing, and border-radius */
     :root {
-      --primary-color: #0A4D68;
-      --secondary-color: #088395;
-      --accent-color: #F5A31A;
-      --light-bg: #F8F9FA;
-      --dark-text: #212529;
-      --light-text: #FFFFFF;
-      --border-radius-md: 0.5rem;
-      --border-radius-lg: 0.75rem;
+      --primary-color: #0A4D68; /* Dark Teal */
+      --secondary-color: #088395; /* Teal */
+      --accent-color: #F5A31A; /* Orange Accent */
+      --light-bg: #F8F9FA; /* Light Grey Background */
+      --dark-text: #212529; /* Dark Text */
+      --light-text: #FFFFFF; /* Light Text */
+      --border-radius-md: 0.5rem; /* 8px */
+      --border-radius-lg: 0.75rem; /* 12px */
     }
 
-    /* ... (CSS sama dengan index.html) ... */
+    /* Body styling for background color and font */
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Roboto', Arial, sans-serif;
+      color: var(--dark-text);
+      line-height: 1.6;
+    }
 
-    /* Tambahan styling untuk QR & Barcode */
+    /* Font family for headings, navbar brand, buttons, and form labels */
+    h1, h2, h3, h4, h5, h6, .navbar-brand, .btn, .form-label {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Modern Navbar Styling */
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    /* Navbar brand styling */
+    .navbar-brand {
+      font-weight: 600;
+      color: var(--primary-color) !important;
+    }
+
+    /* Navbar brand icon spacing and color */
+    .navbar-brand i {
+      margin-right: 0.5rem;
+      color: var(--secondary-color);
+    }
+
+    /* Navbar link styling and hover effect */
+    .nav-link {
+      font-weight: 500;
+      color: #555 !important;
+      transition: color 0.2s ease-in-out;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--secondary-color) !important;
+    }
+
+    /* Card Form Styling */
+    .card-form {
+      max-width: 800px;
+      margin: 2.5rem auto; /* More top/bottom spacing */
+      padding: 2.5rem; /* Larger padding */
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Softer, wider shadow */
+      background-color: #ffffff;
+      border: none; /* Remove default border */
+    }
+
+    .form-section {
+        margin-bottom: 2rem; /* Space below the form section */
+    }
+
+    /* Logo container for centering */
+    .logo-container {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Logo image styling */
+    .logo-container img {
+      max-width: 160px; /* Adjust as needed */
+      border-radius: 8px; /* If your logo fits with border-radius */
+    }
+
+    /* Custom horizontal rule styling */
+    hr.custom-line {
+      border: 0;
+      height: 1px;
+      background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.1), rgba(0,0,0,0));
+      margin: 2rem 0; /* More spacing */
+    }
+
+    /* Form Elements Styling */
+    .form-control {
+      border-radius: var(--border-radius-md);
+      padding: 0.85rem 1.15rem; /* More comfortable padding */
+      border: 1px solid #ced4da;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Form control focus state styling */
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.25rem rgba(8, 131, 149, 0.25); /* Use RGB for opacity */
+    }
+
+    /* Button base styling */
+    .btn {
+      border-radius: var(--border-radius-md);
+      padding: 0.8rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.25s ease-out;
+      text-transform: none; /* Or uppercase if preferred */
+      letter-spacing: 0.3px;
+    }
+
+    /* Button icon spacing */
+    .btn i {
+      margin-right: 0.5rem;
+    }
+
+    /* Styling for QR & Barcode containers */
     .code-container {
       display: flex;
       justify-content: center;
-      gap: 3rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
+      gap: 3rem; /* Space between QR and Barcode */
+      margin-top: 2rem; /* Add margin only above */
+      margin-bottom: 1.5rem; /* Space below codes, before data */
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+      padding: 1rem; /* Add padding around codes */
+      background-color: #f7f9fc; /* Light background for code area */
+      border-radius: var(--border-radius-md);
+      border: 1px solid #e3e9ef;
     }
-    
+
+    /* Wrapper for individual code (QR or Barcode) */
     .code-wrapper {
       text-align: center;
       padding: 1rem;
       background: white;
       border-radius: var(--border-radius-md);
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin: 1rem 0;
+      margin: 0; /* Remove margin here as it's on code-container */
     }
 
+    /* Label for QR or Barcode */
     .code-label {
       margin-top: 1rem;
       font-weight: 600;
       color: var(--primary-color);
       font-size: 1.1rem;
     }
+
+    /* Styling for the Data Result Area (similar to index.html) */
+    #dataResult {
+      display: none; /* Hidden by default */
+      margin-top: 2rem;
+      padding: 2rem;
+      border-radius: var(--border-radius-md);
+      background-color: #f7f9fc;
+      border: 1px solid #e3e9ef;
+      animation: fadeInResult 0.5s ease-out;
+    }
+    @keyframes fadeInResult {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Styling for the document content within the result area */
+    #dataResult.document h5, #dataResult.document h6 {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    #dataResult.document h5 {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+    #dataResult.document h6 {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    #dataResult.document .table {
+      margin-bottom: 1.5rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+      border-radius: var(--border-radius-md);
+      overflow: hidden; /* Agar border-radius tabel terlihat */
+    }
+    #dataResult.document .table th {
+      background-color: var(--primary-color);
+      color: var(--light-text);
+      font-weight: 600;
+      padding: 0.9rem 1rem;
+    }
+    #dataResult.document .table td {
+      padding: 0.9rem 1rem;
+      vertical-align: middle;
+    }
+    #dataResult.document .table-bordered {
+        border: 1px solid #dee2e6;
+    }
+    #dataResult.document .table-bordered th, #dataResult.document .table-bordered td {
+        border: 1px solid #dee2e6;
+    }
+    #dataResult.document .table-hover tbody tr:hover {
+        background-color: rgba(var(--secondary-color-rgb, 8, 131, 149), 0.05);
+    }
+
+    #dataResult.document strong {
+        font-weight: 500; /* Roboto 500 atau Poppins 500 */
+    }
+    #dataResult.document .text-danger {
+        color: #dc3545 !important; /* Bootstrap's default danger color */
+    }
+
+    /* Action buttons container (Export, Close) */
+    .action-buttons-container {
+        display: flex;
+        justify-content: flex-end; /* Position to the right */
+        gap: 0.75rem; /* Space between buttons */
+        margin-bottom: 1rem; /* Space before result */
+    }
+    .action-buttons-container .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    /* Styling for the combined export content */
+    #exportContent {
+        background: white; /* Ensure white background for PDF */
+        padding: 20px; /* Add some padding for PDF */
+        max-width: 794px; /* A4 width approx */
+        margin: auto; /* Center the content */
+        /* Add a border or shadow if desired for visual separation in HTML */
+        /* border: 1px solid #ccc; */
+        /* box-shadow: 0 0 10px rgba(0,0,0,0.1); */
+    }
+
+    /* Adjust spacing within export content for PDF */
+    #exportContent .code-container {
+        margin-top: 0; /* Remove top margin inside export content */
+        margin-bottom: 1.5rem; /* Keep space below codes */
+        border: none; /* Remove border/background for cleaner PDF */
+        background-color: transparent;
+        padding: 0; /* Remove padding for cleaner PDF */
+    }
+
+    #exportContent #dataResult {
+        margin-top: 0; /* Remove top margin inside export content */
+        padding: 0; /* Remove padding for cleaner PDF */
+        border: none; /* Remove border/background for cleaner PDF */
+        background-color: transparent;
+    }
+
+    /* Simple Loading Spinner */
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+    .loading-spinner .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        color: var(--primary-color);
+    }
+
+    /* Footer Styling */
+    .footer {
+      background-color: var(--primary-color);
+      color: rgba(255,255,255,0.8);
+      padding: 2rem 0;
+      text-align: center;
+      margin-top: 4rem;
+      font-size: 0.9rem;
+    }
+
+    /* Footer paragraph spacing */
+    .footer p {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Logout Button Styling */
+    .btn-logout {
+      background-color: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      margin-left: 1rem; /* Space from previous nav item */
+    }
+
+    /* Logout button hover effect */
+    .btn-logout:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
   </style>
 </head>
 <body>
-<!-- Navbar sama dengan index.html tapi link active di Create SI -->
 <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand" href="#"><i class="fas fa-ship"></i> Tracking Bungker</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="/index.html">Beranda</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
         <li class="nav-item"><a class="nav-link active" href="/barcode-qr.html">Create SI</a></li>
         <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-logout" href="#">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
       </ul>
     </div>
   </div>
@@ -81,20 +344,42 @@
 
     <hr class="custom-line">
 
-    <div class="form-section">
-      <form id="trackerForm" class="d-flex gap-3 flex-column flex-md-row mb-3">
-        <input type="text" id="transaction_no" class="form-control form-control-lg" placeholder="Masukkan No Transaksi Anda" required />
-        <button type="submit" class="btn btn-primary btn-lg px-4"><i class="fas fa-file-alt"></i> Create SI</button>
-      </form>
+    <h2 class="text-center mb-4">Buat Barcode & QR Code Shipping Instruction</h2>
 
-      <div class="action-buttons-container">
-        <button id="exportPdfBtn" class="btn btn-success btn-sm d-none"><i class="fas fa-file-pdf"></i> Export PDF</button>
-        <button class="btn btn-danger btn-sm d-none" id="closeResultBtn" onclick="closeResult()"><i class="fas fa-times-circle"></i> Tutup Data</button>
-      </div>
-      
-      <div id="result" class="document">
-          </div>
+    <div class="form-section">
+        <div class="mb-3">
+          <label for="transactionNoInput" class="form-label">Nomor Transaksi:</label>
+          <input type="text" class="form-control form-control-lg" id="transactionNoInput" placeholder="Masukkan Nomor Transaksi" required>
+        </div>
+
+        <div class="d-grid gap-2 mb-4">
+          <button class="btn btn-primary btn-lg" onclick="generateCodes()"><i class="fas fa-sync-alt"></i> Generate Code & Show Data</button>
+        </div>
     </div>
+
+    <div id="exportContent" style="display: none;">
+        <div id="codesContainer" class="code-container">
+          <div id="qrcode" class="code-wrapper">
+            <div id="qrcodeCanvas"></div>
+            <div class="code-label">QR Code</div>
+          </div>
+
+          <div id="barcode" class="code-wrapper">
+            <svg id="barcodeSvg"></svg>
+            <div class="code-label">Barcode</div>
+          </div>
+        </div>
+
+        <div id="dataResult" class="document">
+            </div>
+    </div>
+
+
+    <div class="action-buttons-container mt-4" id="dataActionButtons" style="display: none;">
+        <button id="exportPdfBtn" class="btn btn-success btn-sm"><i class="fas fa-file-pdf"></i> Export PDF</button>
+        <button class="btn btn-danger btn-sm" id="closeResultBtn" onclick="closeResult()"><i class="fas fa-times-circle"></i> Tutup Data</button>
+    </div>
+
   </div>
 </div>
 
@@ -106,147 +391,237 @@
 </footer>
 
 <script>
-  // Script utama sama dengan index.html dengan tambahan generate QR-Barcode
-  const form = document.getElementById('trackerForm');
-  const outputDiv = document.getElementById('result');
-  const closeBtn = document.getElementById('closeResultBtn');
-  const exportBtn = document.getElementById('exportPdfBtn');
+  // Get current year for the footer
+  if (document.getElementById('currentYear')) {
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  }
 
-  document.getElementById('currentYear').textContent = new Date().getFullYear();
+  // Function to generate QR Code, Barcode, and fetch/display data
+  async function generateCodes() {
+    const transactionNo = document.getElementById('transactionNoInput').value;
+    const exportContent = document.getElementById('exportContent'); // New container
+    const codesContainer = document.getElementById('codesContainer');
+    const qrcodeCanvasDiv = document.getElementById('qrcodeCanvas');
+    const barcodeSvg = document.getElementById('barcodeSvg');
+    const dataResultDiv = document.getElementById('dataResult');
+    const dataActionButtons = document.getElementById('dataActionButtons');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const closeResultBtn = document.getElementById('closeResultBtn');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const transaction_no = document.getElementById('transaction_no').value;
 
-    outputDiv.innerHTML = `<div class="loading-spinner"><div class="spinner-border" role="status"></div></div>`;
-    outputDiv.style.display = 'block';
-    closeBtn.classList.add('d-none');
-    exportBtn.classList.add('d-none');
+    // Clear previous codes and data
+    qrcodeCanvasDiv.innerHTML = '';
+    barcodeSvg.innerHTML = '';
+    dataResultDiv.innerHTML = '';
+    exportContent.style.display = 'none'; // Hide the main export container initially
+    dataActionButtons.style.display = 'none';
 
+
+    if (!transactionNo) {
+      alert("Mohon masukkan Nomor Transaksi terlebih dahulu.");
+      return;
+    }
+
+    // --- Generate Codes ---
     try {
-        const response = await fetch('/track', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transaction_no })
+        // Generate QR Code
+        new QRCode(qrcodeCanvasDiv, {
+            text: transactionNo,
+            width: 200,
+            height: 200,
+            colorDark : "#0A4D68", // Use primary color for dark dots
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
         });
 
-        if (!response.ok) throw new Error('Gagal mengambil data');
+        // Generate Barcode
+        JsBarcode("#barcodeSvg", transactionNo, {
+            format: "CODE128", // Or other suitable format
+            lineColor: "#0A4D68", // Use primary color for barcode lines
+            width: 2,
+            height: 100,
+            displayValue: true // Show the transaction number below the barcode
+        });
+
+        codesContainer.style.display = 'flex'; // Show the codes container within exportContent
+        exportContent.style.display = 'block'; // Show the main export container
+    } catch (error) {
+        console.error("Error generating codes:", error);
+        alert("Gagal membuat barcode/QR code. Pastikan nomor transaksi valid.");
+        // Continue to fetch data even if code generation fails, or return?
+        // For now, let's continue to fetch data.
+    }
+
+
+    // --- Fetch and Display Data (similar to index.html) ---
+    // Show loading spinner in the data result area
+    dataResultDiv.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>`;
+    dataResultDiv.style.display = 'block'; // Show data result area (with spinner)
+    dataActionButtons.style.display = 'none'; // Hide buttons while loading
+
+
+    try {
+        const response = await fetch('/track', { // Assuming '/track' is the correct endpoint
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transaction_no: transactionNo })
+        });
+
+        if (!response.ok) {
+            const errorResult = await response.json().catch(() => ({ message: `Error: ${response.status} ${response.statusText}` }));
+            throw new Error(errorResult.message || `Gagal mengambil data. Status: ${response.status}`);
+        }
 
         const result = await response.json();
+
         if (result.success && result.data) {
             const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
-            const tagText = tags?.[0] || '-';
+            const tagText = (tags && tags.length > 0) ? tags[0] : '-';
             const customerName = person?.display_name || '-';
             const statusMemo = memo || '-';
 
             const itemsHtml = transaction_lines_attributes.map((item, i) => `
                 <tr>
-                    <td>${i + 1}</td>
-                    <td>${item.product.name || '-'}</td>
-                    <td>${item.quantity ?? 0}</td>
+                <td>${i + 1}</td>
+                <td>${item.product.name || '-'}</td>
+                <td>${item.quantity ?? 0}</td>
                 </tr>`).join('');
-            
             const totalQty = transaction_lines_attributes.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
-            outputDiv.innerHTML = `
+            dataResultDiv.innerHTML = `
                 <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
                 <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
-                
-                <!-- Tambahan QR dan Barcode di tengah -->
-                <div class="code-container">
-                  <div class="code-wrapper">
-                    <div id="qrcode"></div>
-                    <div class="code-label">QR CODE</div>
-                  </div>
-                  <div class="code-wrapper">
-                    <svg id="barcode"></svg>
-                    <div class="code-label">BARCODE</div>
-                  </div>
-                </div>
-
                 <h6 style="color: ${statusMemo.toLowerCase() === 'selesai bongkar' ? '#dc3545' : '#198754'};">Status: ${statusMemo}</h6>
                 <p><strong>Nama Customer:</strong> ${customerName}</p>
 
                 <table class="table table-bordered table-hover">
-                    <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
-                    <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
+                <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
+                <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
                 </table>
 
                 <table class="table table-bordered table-hover">
-                    <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
-                    <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
-                    <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
-                    <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
-                    <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
-                    <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
+                <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
+                <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
+                <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
+                <tr><td>Nama Kapal</td><td>${ship_via || '-'}</td></tr>
+                <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
+                <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
                 </table>
 
                 <table class="table table-bordered table-hover">
-                    <thead><tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr></thead>
-                    <tbody>
-                        ${itemsHtml}
-                        <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
-                    </tbody>
+                <thead> <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                    <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
+                </tbody>
                 </table>
+
+                ${statusMemo.toLowerCase() === 'selesai bongkar' ? `<p class="text-danger fw-bold mt-3">* EXPIRED CAN NOT BE USED AND DUPLICATED *</p>` : ''}
 
                 <p class="mt-4">Lampung, ...............................................</p>
                 <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARVINDO TECH LESTARI</p>
             `;
 
-            // Generate QR Code
-            new QRCode(document.getElementById('qrcode'), {
-                text: transaction_no,
-                width: 150,
-                height: 150,
-                colorDark: "#0A4D68"
-            });
+            dataResultDiv.style.display = 'block'; // Ensure data section is visible
+            dataActionButtons.style.display = 'flex'; // Show action buttons
+            exportPdfBtn.classList.remove('d-none'); // Ensure export button is visible
+            closeResultBtn.classList.remove('d-none'); // Ensure close button is visible
 
-            // Generate Barcode
-            JsBarcode('#barcode', transaction_no, {
-                format: 'CODE128',
-                displayValue: true,
-                fontSize: 16,
-                lineColor: "#0A4D68",
-                width: 2,
-                height: 60
-            });
-
-            outputDiv.style.display = 'block';
-            closeBtn.classList.remove('d-none');
-            exportBtn.classList.remove('d-none');
         } else {
-            outputDiv.innerHTML = `<div class="alert alert-warning text-center"><i class="fas fa-exclamation-triangle me-2"></i>${result.message}</div>`;
-            outputDiv.style.display = 'block';
-            closeBtn.classList.remove('d-none');
+            const message = result.message || 'Data tidak ditemukan atau terjadi kesalahan.';
+            dataResultDiv.innerHTML = `<div class="alert alert-warning text-center"><i class="fas fa-exclamation-triangle me-2"></i>${message}</div>`;
+            dataResultDiv.style.display = 'block';
+            dataActionButtons.style.display = 'flex'; // Show buttons even on error/no data
+            exportPdfBtn.classList.add('d-none'); // Hide export button if no data
+            closeResultBtn.classList.remove('d-none'); // Show close button
         }
     } catch (error) {
-        outputDiv.innerHTML = `<div class="alert alert-danger text-center"><i class="fas fa-times-circle me-2"></i>${error.message}</div>`;
-        outputDiv.style.display = 'block';
-        closeBtn.classList.remove('d-none');
+        console.error("Fetch error:", error);
+        dataResultDiv.innerHTML = `<div class="alert alert-danger text-center"><i class="fas fa-times-circle me-2"></i>Terjadi kesalahan saat mengambil data: ${error.message}</div>`;
+        dataResultDiv.style.display = 'block';
+        dataActionButtons.style.display = 'flex'; // Show buttons on fetch error
+        exportPdfBtn.classList.add('d-none'); // Hide export button on error
+        closeResultBtn.classList.remove('d-none'); // Show close button
     }
-  });
-
-  // Fungsi closeResult dan exportPDF sama dengan index.html
-  function closeResult() {
-    outputDiv.style.display = 'none';
-    outputDiv.innerHTML = '';
-    closeBtn.classList.add('d-none');
-    exportBtn.classList.add('d-none');
-    document.getElementById('transaction_no').value = '';
   }
 
+  // Function to close the data result area and codes
+  function closeResult() {
+    const exportContent = document.getElementById('exportContent');
+    const dataResultDiv = document.getElementById('dataResult');
+    const codesContainer = document.getElementById('codesContainer');
+    const dataActionButtons = document.getElementById('dataActionButtons');
+
+    exportContent.style.display = 'none'; // Hide the main export container
+    dataResultDiv.innerHTML = ''; // Clear data content
+    codesContainer.innerHTML = `
+        <div id="qrcode" class="code-wrapper">
+            <div id="qrcodeCanvas"></div>
+            <div class="code-label">QR Code</div>
+        </div>
+        <div id="barcode" class="code-wrapper">
+            <svg id="barcodeSvg"></svg>
+            <div class="code-label">Barcode</div>
+        </div>`; // Reset codes container HTML structure
+    codesContainer.style.display = 'none'; // Hide codes container
+    dataActionButtons.style.display = 'none'; // Hide action buttons
+    document.getElementById('transactionNoInput').value = ''; // Clear input field
+  }
+
+
+  // Function to export the combined content as PDF
   document.getElementById('exportPdfBtn').addEventListener('click', () => {
-    // Logika export PDF sama dengan index.html
-    const element = document.getElementById('result');
+    const element = document.getElementById('exportContent'); // Target the new container
+    const originalTitle = document.title;
+    const transactionNoElement = element.querySelector('h6'); // Find transaction number within the exported content
+    let fileName = `shipping-instruction-${Date.now()}.pdf`;
+
+    if (transactionNoElement && transactionNoElement.innerText.includes('No.')) {
+        const transactionNoText = transactionNoElement.innerText.split('No.')[1]?.trim();
+        if (transactionNoText) {
+            const safeTransactionNo = transactionNoText.replace(/[^a-zA-Z0-9.-]/g, '_');
+            fileName = `SI_${safeTransactionNo}.pdf`;
+        }
+    }
+    document.title = fileName.replace('.pdf', '');
+
+    element.classList.add('pdf-export'); // Apply PDF specific styles
+
     const opt = {
-        margin: [0.5, 0.4],
-        filename: `SI_${Date.now()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      margin:       [0.5, 0.4, 0.5, 0.4], // [top, left, bottom, right] in inches
+      filename:     fileName,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight},
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
-    html2pdf().from(element).set(opt).save();
+
+    html2pdf().from(element).set(opt).save().then(() => {
+      element.classList.remove('pdf-export'); // Remove PDF specific styles
+      document.title = originalTitle;
+    }).catch(err => {
+        console.error("Error exporting PDF:", err);
+        element.classList.remove('pdf-export');
+        document.title = originalTitle;
+        alert("Gagal mengekspor PDF. Silakan coba lagi.");
+    });
   });
+
+
+  // Add event listener for Enter key on input field
+  document.getElementById('transactionNoInput').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+          event.preventDefault(); // Prevent default form submission if it were a form
+          generateCodes();
+      }
+  });
+
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
