@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tracking Bungker - Barcode/QR</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -45,32 +46,34 @@
       display: none;
       margin-top: 1rem;
     }
-    /* .btn-close-custom tidak digunakan, bisa dihapus jika tidak ada elemennya */
-    /* .ship-img tidak digunakan, bisa dihapus jika tidak ada elemennya */
     .form-section {
       position: relative;
       z-index: 1;
     }
     hr.custom-line {
-      border-top: 1px solid #dee2e6; /* Sedikit ubah style hr */
-      margin: 1.5rem 0; /* Sesuaikan margin */
+      border-top: 1px solid #dee2e6; 
+      margin: 1.5rem 0; 
     }
     .barcode-qr-container {
       display: flex;
+      flex-direction: column; /* Susun vertikal untuk penyesuaian lebih mudah */
       justify-content: center;
-      align-items: center; /* Pusatkan vertikal juga */
-      gap: 2rem;
+      align-items: center; 
+      gap: 1.5rem; /* Kurangi gap jika perlu */
       margin: 2rem 0;
     }
-    /* Untuk memastikan PDF tidak terpotong */
+    #barcode { /* Pastikan barcode tidak terlalu lebar */
+        max-width: 100%;
+    }
+    #qrcode img { 
+        margin: auto;
+        display: block; /* Pastikan gambar QR terpusat */
+    }
     .document {
       page-break-inside: avoid;
     }
     .table {
       page-break-inside: avoid;
-    }
-    #qrcode img { /* Pastikan QR code terlihat jelas */
-        margin: auto;
     }
   </style>
 </head>
@@ -105,7 +108,8 @@
         <input type="text" id="transaction_no" class="form-control" placeholder="Masukkan No Transaksi" required />
         <button type="submit" class="btn btn-primary px-4">Create Shipping Instruction</button>
       </form>
-      <div class="d-flex justify-content-end gap-2 mb-3"> <button id="exportPdfBtn" class="btn btn-success d-none"><i class="fas fa-file-pdf me-1"></i>Export PDF</button>
+      <div class="d-flex justify-content-end gap-2 mb-3"> 
+        <button id="exportPdfBtn" class="btn btn-success d-none"><i class="fas fa-file-pdf me-1"></i>Export PDF</button>
         <button class="btn btn-danger btn-sm d-none" id="closeResultBtn" onclick="closeResult()"><i class="fas fa-times me-1"></i>Tutup Data</button>
       </div>
       <div id="result" class="document">
@@ -115,35 +119,34 @@
 </div>
 
 <script>
-  // Pastikan Font Awesome sudah diload jika menggunakan ikon seperti <i class="fas fa-file-pdf"></i>
-  // Jika belum, tambahkan link ke Font Awesome di <head>
-  // <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
   const form = document.getElementById('trackerForm');
   const outputDiv = document.getElementById('result');
   const closeBtn = document.getElementById('closeResultBtn');
   const exportBtn = document.getElementById('exportPdfBtn');
-  const transactionNoInput = document.getElementById('transaction_no'); // Ambil input field
+  const transactionNoInput = document.getElementById('transaction_no');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const transaction_no = transactionNoInput.value.trim(); // Trim spasi
+    const transaction_no = transactionNoInput.value.trim();
 
     if (!transaction_no) {
-        alert('Nomor transaksi tidak boleh kosong.');
+        // Menggunakan custom alert box jika ada, atau alert bawaan jika tidak
+        if (typeof showCustomAlert === 'function') { // Asumsi ada fungsi showCustomAlert
+            showCustomAlert('Nomor transaksi tidak boleh kosong.', 'warning');
+        } else {
+            alert('Nomor transaksi tidak boleh kosong.');
+        }
         outputDiv.innerHTML = `<div class="alert alert-warning">Nomor transaksi tidak boleh kosong.</div>`;
         outputDiv.style.display = 'block';
-        closeBtn.classList.add('d-none'); // Sembunyikan tombol tutup jika input kosong
-        exportBtn.classList.add('d-none'); // Sembunyikan tombol export jika input kosong
+        closeBtn.classList.add('d-none');
+        exportBtn.classList.add('d-none');
         return;
     }
 
-    // Tampilkan loading sederhana (opsional)
     outputDiv.innerHTML = `<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div> <p>Memuat data...</p></div>`;
     outputDiv.style.display = 'block';
     closeBtn.classList.add('d-none');
     exportBtn.classList.add('d-none');
-
 
     try {
         const response = await fetch('/track', {
@@ -153,23 +156,33 @@
         });
 
         if (!response.ok) {
-            // Coba parse error dari server jika ada
             let errorMessage = `Gagal mengambil data. Status: ${response.status}`;
             try {
                 const errorResult = await response.json();
                 errorMessage = errorResult.message || errorMessage;
             } catch (parseError) {
-                // Biarkan errorMessage default jika parsing gagal
+                console.warn("Gagal parse error response dari server:", parseError);
             }
             throw new Error(errorMessage);
         }
 
         const result = await response.json();
+        console.log("Data diterima dari server:", result); // Log data yang diterima
 
         if (result.success && result.data) {
           const { transaction_no: res_transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
-          const tagText = (tags && tags.length > 0) ? tags.map(t => t.name || t).join(', ') : '-'; // Jika tags adalah array of objects
-          const customerName = person?.display_name || person?.name || '-'; // Lebih banyak fallback untuk nama customer
+          
+          // Validasi penting untuk res_transaction_no
+          if (typeof res_transaction_no !== 'string' || !res_transaction_no.trim()) {
+            console.error("Nomor transaksi dari server tidak valid atau kosong:", res_transaction_no);
+            outputDiv.innerHTML = `<div class="alert alert-danger">Data transaksi diterima, tetapi nomor transaksi tidak valid.</div>`;
+            closeBtn.classList.remove('d-none');
+            exportBtn.classList.add('d-none');
+            return; 
+          }
+
+          const tagText = (tags && tags.length > 0) ? tags.map(t => t.name || t).join(', ') : '-';
+          const customerName = person?.display_name || person?.name || '-';
 
           const itemsHtml = (transaction_lines_attributes || []).map((item, i) => `
             <tr>
@@ -187,7 +200,8 @@
               <div id="qrcode" class="mt-2"></div>
             </div>
             <p class="mt-3"><strong>Nama Customer:</strong> \${customerName}</p>
-            <table class="table table-bordered table-sm"> <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
+            <table class="table table-bordered table-sm"> 
+              <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
               <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
             </table>
             <table class="table table-bordered table-sm mt-3">
@@ -195,7 +209,7 @@
               <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
               <tr><td>Alamat Kantor Cabang</td><td>-</td></tr>
               <tr><td>Nama Kapal</td><td>\${ship_via || '-'}</td></tr>
-              <tr><td>ETD/ETA</td><td>\${transaction_date ? new Date(transaction_date).toLocaleDateString('id-ID') : '-'} s/d [ETA Belum Tersedia]</td></tr>
+              <tr><td>ETD/ETA</td><td>\${transaction_date ? new Date(transaction_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'} s/d [ETA Belum Tersedia]</td></tr>
               <tr><td>Pelabuhan Muat</td><td>\${tagText}</td></tr>
             </table>
             <table class="table table-bordered table-sm mt-3">
@@ -212,35 +226,51 @@
           \`;
 
           // Generate Barcode
-          if (document.getElementById('barcode')) {
-            JsBarcode("#barcode", res_transaction_no, {
-              format: "CODE128",
-              displayValue: true,
-              fontSize: 16,
-              margin: 10 // Tambahkan margin
-            });
+          const barcodeElement = document.getElementById('barcode');
+          if (barcodeElement) {
+            try {
+              JsBarcode(barcodeElement, res_transaction_no, {
+                format: "CODE128",
+                displayValue: true,
+                fontSize: 16,
+                margin: 10
+              });
+              console.log("Barcode berhasil dibuat untuk:", res_transaction_no);
+            } catch (barcodeError) {
+              console.error("Error saat membuat barcode:", barcodeError);
+              barcodeElement.parentElement.innerHTML = "<p class='text-danger small'>Gagal membuat barcode.</p>";
+            }
+          } else {
+            console.warn("Elemen #barcode tidak ditemukan.");
           }
 
           // Generate QR Code
           const qrcodeElement = document.getElementById('qrcode');
           if (qrcodeElement) {
             qrcodeElement.innerHTML = ''; // Bersihkan QR code sebelumnya
-            new QRCode(qrcodeElement, {
-              text: \`No Transaksi: \${res_transaction_no}\nCustomer: \${customerName}\`, // Info lebih di QR
-              width: 120, // Sedikit lebih kecil agar pas
-              height: 120,
-              correctLevel : QRCode.CorrectLevel.H
-            });
+            try {
+              new QRCode(qrcodeElement, {
+                text: \`No Transaksi: \${res_transaction_no}\nCustomer: \${customerName}\nTanggal: \${transaction_date ? new Date(transaction_date).toLocaleDateString('id-ID') : '-'}\`,
+                width: 120,
+                height: 120,
+                correctLevel : QRCode.CorrectLevel.H
+              });
+              console.log("QR Code berhasil dibuat untuk:", res_transaction_no);
+            } catch (qrError) {
+              console.error("Error saat membuat QR Code:", qrError);
+              qrcodeElement.innerHTML = "<p class='text-danger small'>Gagal membuat QR code.</p>";
+            }
+          } else {
+            console.warn("Elemen #qrcode tidak ditemukan.");
           }
 
           outputDiv.style.display = 'block';
           closeBtn.classList.remove('d-none');
           exportBtn.classList.remove('d-none');
         } else {
-          // Jika success false dari server
           outputDiv.innerHTML = \`<div class="alert alert-warning">\${result.message || 'Data tidak ditemukan atau terjadi kesalahan.'}</div>\`;
           outputDiv.style.display = 'block';
-          closeBtn.classList.remove('d-none'); // Tetap tampilkan tombol tutup
+          closeBtn.classList.remove('d-none');
           exportBtn.classList.add('d-none');
         }
     } catch (error) {
@@ -254,17 +284,22 @@
 
   function closeResult() {
     outputDiv.style.display = 'none';
-    outputDiv.innerHTML = ''; // Kosongkan hasil
+    outputDiv.innerHTML = '';
     closeBtn.classList.add('d-none');
     exportBtn.classList.add('d-none');
-    transactionNoInput.value = ''; // Kosongkan input field
-    transactionNoInput.focus(); // Fokus kembali ke input field
+    transactionNoInput.value = '';
+    transactionNoInput.focus();
   }
 
   document.getElementById('exportPdfBtn').addEventListener('click', () => {
     const elementToExport = document.getElementById('result');
     if (!elementToExport || outputDiv.style.display === 'none' || !elementToExport.innerHTML.trim()) {
-        alert("Tidak ada data untuk diexport ke PDF.");
+        // Menggunakan custom alert box jika ada
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Tidak ada data untuk diexport ke PDF.', 'info');
+        } else {
+            alert("Tidak ada data untuk diexport ke PDF.");
+        }
         return;
     }
 
@@ -278,32 +313,36 @@
         }
     }
 
-    // Tambahkan judul sementara untuk PDF
     const originalTitle = document.title;
     document.title = fileName.replace('.pdf', '');
-
-    elementToExport.classList.add('pdf-export'); // Kelas untuk styling khusus PDF jika ada
+    elementToExport.classList.add('pdf-export');
+    
     const opt = {
-      margin:       [10, 8, 10, 8], // margin: [atas, kiri, bawah, kanan] dalam mm
+      margin:       [10, 8, 10, 8],
       filename:     fileName,
       image:        { type: 'jpeg', quality: 0.95 },
       html2canvas:  {
-        scale: 2, // Tingkatkan skala untuk kualitas lebih baik
-        useCORS: true, // Jika ada gambar dari domain lain
-        scrollY: -window.scrollY, // Atasi masalah scroll
-        windowWidth: document.documentElement.offsetWidth,
-        windowHeight: document.documentElement.offsetHeight
+        scale: 2, 
+        useCORS: true,
+        scrollY: -window.scrollY,
+        windowWidth: elementToExport.scrollWidth, // Gunakan lebar elemen yang diexport
+        windowHeight: elementToExport.scrollHeight // Gunakan tinggi elemen yang diexport
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Hindari pemotongan elemen
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     html2pdf().from(elementToExport).set(opt).save().then(() => {
       elementToExport.classList.remove('pdf-export');
-      document.title = originalTitle; // Kembalikan judul asli
+      document.title = originalTitle;
     }).catch(err => {
       console.error("Error exporting PDF:", err);
-      alert("Gagal mengekspor PDF. Silakan coba lagi.");
+      // Menggunakan custom alert box jika ada
+      if (typeof showCustomAlert === 'function') {
+          showCustomAlert('Gagal mengekspor PDF. Silakan coba lagi.', 'error');
+      } else {
+          alert("Gagal mengekspor PDF. Silakan coba lagi.");
+      }
       elementToExport.classList.remove('pdf-export');
       document.title = originalTitle;
     });
