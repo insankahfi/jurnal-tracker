@@ -18,6 +18,19 @@
 </head>
 <body>
 
+<!-- Cek apakah user sudah login -->
+<script>
+  fetch('/check-auth')
+    .then(res => {
+      if (res.status !== 200) {
+        window.location.href = '/login.html';
+      }
+    })
+    .catch(() => {
+      window.location.href = '/login.html';
+    });
+</script>
+
 <div class="container">
   <div class="card shadow">
     <h4 class="mb-4 text-center">Update Status Bongkar</h4>
@@ -39,16 +52,18 @@
         </select>
       </div>
 
-      <!-- Tombol Ambil Data -->
       <div class="mb-3">
         <button type="button" class="btn btn-secondary w-100" onclick="ambilData()">Ambil Data</button>
       </div>
 
-      <!-- Tombol Submit -->
       <button type="submit" class="btn btn-primary w-100">Kirim</button>
     </form>
 
     <div id="alertBox" class="alert mt-3 d-none" role="alert"></div>
+
+    <div class="mt-3 text-center">
+      <a href="/logout" class="btn btn-outline-danger">Logout</a>
+    </div>
   </div>
 </div>
 
@@ -64,23 +79,29 @@
       return;
     }
 
-    const response = await fetch('/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transaction_no })
-    });
+    try {
+      const response = await fetch('/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transaction_no })
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (result.success) {
-      currentInvoice = result.data;
-      alertBox.textContent = 'Data ditemukan untuk: ' + (currentInvoice.person?.display_name || 'tanpa nama');
-      alertBox.className = 'alert alert-info mt-3';
-      alertBox.classList.remove('d-none');
-    } else {
-      currentInvoice = null;
-      alertBox.textContent = 'Gagal ambil data: ' + result.message;
-      alertBox.className = 'alert alert-warning mt-3';
+      if (result.success) {
+        currentInvoice = result.data;
+        alertBox.textContent = 'Data ditemukan: ' + (currentInvoice.person?.display_name || 'tanpa nama');
+        alertBox.className = 'alert alert-info mt-3';
+        alertBox.classList.remove('d-none');
+      } else {
+        currentInvoice = null;
+        alertBox.textContent = 'Gagal ambil data: ' + result.message;
+        alertBox.className = 'alert alert-warning mt-3';
+        alertBox.classList.remove('d-none');
+      }
+    } catch (err) {
+      alertBox.textContent = 'Terjadi kesalahan koneksi.';
+      alertBox.className = 'alert alert-danger mt-3';
       alertBox.classList.remove('d-none');
     }
   }
