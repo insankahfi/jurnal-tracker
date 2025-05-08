@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
+    <script>
+        // Cek login
+        const token = localStorage.getItem('token');
+        if (!token) {
+          // Simpan halaman tujuan sebelum redirect
+          localStorage.setItem('redirect_after_login', '/barcode-qr.html');
+          window.location.href = '/login.html';
+        }
+      </script>
+      
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -79,7 +89,6 @@
       gap: 2rem;
       margin: 2rem 0;
     }
-    /* Ensure PDF fits on one page */
     .document {
       page-break-inside: avoid;
     }
@@ -89,6 +98,19 @@
   </style>
 </head>
 <body>
+
+<!-- Cek login session -->
+<script>
+  fetch('/check-auth')
+    .then(res => {
+      if (res.status !== 200) {
+        window.location.href = '/login.html';
+      }
+    })
+    .catch(() => {
+      window.location.href = '/login.html';
+    });
+</script>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
@@ -104,6 +126,7 @@
         <li class="nav-item"><a class="nav-link" href="#">Kontak Kami</a></li>
         <li class="nav-item"><a class="nav-link" href="/update-status.html">Create SI</a></li>
         <li class="nav-item"><a class="nav-link" href="/update-status.html">Update Status</a></li>
+        <li class="nav-item"><a class="nav-link text-danger" href="/logout">Logout</a></li>
       </ul>
     </div>
   </div>
@@ -158,8 +181,6 @@
       const { transaction_no, transaction_date, ship_via, tags, person, transaction_lines_attributes, memo } = result.data;
       const tagText = (tags && tags.length > 0) ? tags[0] : '-';
       const customerName = person?.display_name || '-';
-      const statusMemo = memo || '-';
-
       const itemsHtml = transaction_lines_attributes.map((item, i) => `
         <tr>
           <td>${i + 1}</td>
@@ -171,21 +192,15 @@
       outputDiv.innerHTML = `
         <h5>Dokumen Permintaan Pengapalan Barang Angkutan Laut</h5>
         <h6>SHIPPING INSTRUCTION<br>No. ${transaction_no}</h6>
-        
         <div class="barcode-qr-container">
-          <div>
-            <svg id="barcode"></svg>
-          </div>
+          <div><svg id="barcode"></svg></div>
           <div id="qrcode"></div>
         </div>
-
-                <p><strong>Nama Customer:</strong> ${customerName}</p>
-
+        <p><strong>Nama Customer:</strong> ${customerName}</p>
         <table class="table table-bordered">
           <tr><td>Nama Pemilik/Pengirim Barang</td><td>PT. ARIVINDO TECH LESTARI</td></tr>
           <tr><td>Alamat Perusahaan</td><td>Dusun 4, Desa Rejo Mulyo RT09, Kec. Tanjung Bintang, Tanjung Bintang, Kab.Lampung Selatan</td></tr>
         </table>
-
         <table class="table table-bordered">
           <tr><td>Nama Pelayaran Agen</td><td>Rejomulyo</td></tr>
           <tr><td>Alamat Kantor Pusat</td><td>Gedung Menara 165 Lt 4 , Jalan TB simatupang, Kav 1 Cilandak Timur, Pasar Minggu, Kota Adm Jakarta Selatan</td></tr>
@@ -194,7 +209,6 @@
           <tr><td>ETD/ETA</td><td>${transaction_date} s/d [ETA]</td></tr>
           <tr><td>Pelabuhan Muat</td><td>${tagText}</td></tr>
         </table>
-
         <table class="table table-bordered">
           <thead class="table-primary">
             <tr><th>NO</th><th>JENIS BARANG</th><th>JUMLAH (Liter)</th></tr>
@@ -204,19 +218,16 @@
             <tr><td colspan="2"><strong>JUMLAH</strong></td><td><strong>${totalQty}</strong></td></tr>
           </tbody>
         </table>
-
         <p>Lampung, ...............................................</p>
         <p><strong>Pemilik/Pengirim Barang</strong><br>PT. ARIVINDO TECH LESTARI</p>
       `;
 
-      // Generate Barcode
       JsBarcode("#barcode", transaction_no, {
         format: "CODE128",
         displayValue: true,
         fontSize: 16,
       });
 
-      // Generate QR Code
       const qrcodeElement = document.getElementById('qrcode');
       qrcodeElement.innerHTML = '';
       new QRCode(qrcodeElement, {
@@ -248,34 +259,21 @@
       margin: [10, 5],
       filename: `shipping-instruction-${new Date().getTime()}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
+      html2canvas: {
         scale: 2,
         scrollY: 0,
         windowHeight: element.scrollHeight
       },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
         orientation: 'portrait',
         compress: true
       },
       pagebreak: { avoid: '.document, .table' }
     };
-    
-    // Force single page by adjusting content
-    const originalContent = element.innerHTML;
-    const tempContent = document.createElement('div');
-    tempContent.innerHTML = originalContent;
-    
-    // Remove any elements that might cause page breaks
-    const elementsToRemove = tempContent.querySelectorAll('.page-break');
-    elementsToRemove.forEach(el => el.remove());
-    
-    element.innerHTML = tempContent.innerHTML;
-    
     html2pdf().set(opt).from(element).save().then(() => {
       element.classList.remove('pdf-export');
-      element.innerHTML = originalContent; // Restore original content
     });
   });
 </script>
